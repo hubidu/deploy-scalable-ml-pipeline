@@ -2,6 +2,7 @@
     Train the machine learning model
 """
 import pandas as pd
+from joblib import dump, load
 from sklearn.model_selection import train_test_split
 from ml.data import process_data
 from ml.model import train_model
@@ -27,4 +28,4 @@ X_train, y_train, encoder, lb = process_data(
 
 model = train_model(X_train, y_train)
 
-# save the model
+dump(model, './model/census_model.joblib')
