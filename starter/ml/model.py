@@ -3,6 +3,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import BaggingClassifier
 
+
 def train_model(X_train, y_train):
     """
     Trains a machine learning model and returns it.
