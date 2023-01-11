@@ -59,8 +59,8 @@ def test_inference(training_data, y_preds):
 def test_compute_model_metrics(training_data, y_preds):
 	_, _, _, y_test = training_data
 
-	precision, recall, fbeta, _ = compute_model_metrics(y_test, y_preds)
+	precision, recall, fbeta = compute_model_metrics(y_test, y_preds)
 
-	assert precision > 0.5
-	assert recall > 0.5
-	assert fbeta > 0.5
+	assert precision > 0.72
+	assert recall > 0.6
+	assert fbeta > 0.65
