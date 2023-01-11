@@ -59,6 +59,9 @@ def process_data(
         x_categorical = encoder.fit_transform(x_categorical)
         y = lb.fit_transform(y.values).ravel()
     else:
+        if encoder is None:
+            encoder = OneHotEncoder(sparse=False, handle_unknown="ignore")
+
         x_categorical = encoder.transform(x_categorical)
         try:
             y = lb.transform(y.values).ravel()
