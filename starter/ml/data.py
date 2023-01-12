@@ -1,9 +1,10 @@
 import numpy as np
-from sklearn.preprocessing import LabelBinarizer, OneHotEncoder
+from sklearn.preprocessing import LabelBinarizer, OneHotEncoder, StandardScaler
 
 
 def process_data(
-    X, categorical_features=[], label=None, training=True, encoder=None, lb=None
+    X, categorical_features=[], label=None, training=True,
+    encoder=None, lb=None, scaler=None
 ):
     """ Process the data used in the machine learning pipeline.
 
@@ -54,15 +55,15 @@ def process_data(
     x_continuous = X.drop(*[categorical_features], axis=1)
 
     if training is True:
-        encoder = OneHotEncoder(sparse=False, handle_unknown="ignore")
+        scaler = StandardScaler()
+        encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
         lb = LabelBinarizer()
         x_categorical = encoder.fit_transform(x_categorical)
+        x_continuous = scaler.fit_transform(x_continuous)
         y = lb.fit_transform(y.values).ravel()
     else:
-        if encoder is None:
-            encoder = OneHotEncoder(sparse=False, handle_unknown="ignore")
-
         x_categorical = encoder.transform(x_categorical)
+        x_continuous = scaler.transform(x_continuous)
         try:
             y = lb.transform(y.values).ravel()
         # Catch the case where y is None because we're doing inference.
@@ -70,4 +71,4 @@ def process_data(
             pass
 
     X = np.concatenate([x_continuous, x_categorical], axis=1)
-    return X, y, encoder, lb
+    return X, y, encoder, lb, scaler

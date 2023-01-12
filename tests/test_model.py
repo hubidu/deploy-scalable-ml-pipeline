@@ -21,7 +21,7 @@ def training_data():
 		"native-country",
 	]
 
-	X, y, _, _ = process_data(
+	X, y, _, _, _ = process_data(
 		train, categorical_features=cat_features, label="salary", training=True
 	)
 

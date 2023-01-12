@@ -1,8 +1,10 @@
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from starter.ml.model import inference
+from starter.ml.data import process_data
 from joblib import load
 
 app = FastAPI()
@@ -13,16 +15,18 @@ class PersonData(BaseModel):
     workclass: str
     fnlgt: int
     education: str
-    marital_status: str 
+    marital_status: str = Field(alias="marital-status")
     occupation: str
     relationship: str
     race: str
     sex: str
-    capital_gain: int
-    capital_loss: int
-    hours_per_week: int
-    native_country: str
+    capital_gain: int = Field(alias="capital-gain")
+    capital_loss: int = Field(alias="capital-loss")
+    hours_per_week: int = Field(alias="hours-per-week")
+    native_country: str = Field(alias="native-country")
 
+    class Config:
+        allow_population_by_field_name = True
 
 @app.get("/")
 def get_root():
@@ -31,27 +35,26 @@ def get_root():
 
 @app.post("/predict")
 def predict(person_data: PersonData):
-    all_cols = [
-                "age", "workclass", "fnlgt", "education", "marital-status",
-                "occupation", "relationship", "race", "sex", "capital-gain", 
-                "capital-loss", "hours-per-week", "native-country"
-               ]
+    cat_features = [
+        "workclass",
+        "education",
+        "marital-status",
+        "occupation",
+        "relationship",
+        "race",
+        "sex",
+        "native-country",
+    ]
     model = load("./model/census_model.joblib")
+    encoder = load("./model/encoder.joblib")
+    scaler = load("./model/scaler.joblib")
 
-    preds = inference(model, pd.DataFrame(data=[
-                                        person_data.age, 
-                                        person_data.workclass, 
-                                        person_data.fnlgt, 
-                                        person_data.education, 
-                                        person_data.marital_status, 
-                                        person_data.occupation, 
-                                        person_data.relationship, 
-                                        person_data.race, 
-                                        person_data.sex, 
-                                        person_data.capital_gain, 
-                                        person_data.capital_loss, 
-                                        person_data.hours_per_week, 
-                                        person_data.native_country
-                                        ], columns=all_cols))
+    df = pd.DataFrame(data=person_data.dict(by_alias=True), index=[0])
+    
+    X, _, _, _, _ = process_data(
+        df, cat_features, None, training=False, encoder=encoder, scaler=scaler
+    )
+    
+    preds = inference(model, X)
 
-    return {'predictions': preds}
+    return JSONResponse(content={'predictions': preds.tolist()})
