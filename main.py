@@ -57,4 +57,4 @@ def predict(person_data: PersonData):
     
     preds = inference(model, X)
 
-    return JSONResponse(content={'predictions': preds.tolist()})
+    return JSONResponse(content={'predictions': int(preds[0])})
