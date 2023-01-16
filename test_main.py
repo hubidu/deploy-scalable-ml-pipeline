@@ -23,7 +23,7 @@ def test_predict_under_50K_salary():
     )
     response = client.post("predict", json=person.dict())
     assert response.status_code == 200
-    assert {'predictions': [0]} == response.json()
+    assert {'predictions': 0} == response.json()
 
 
 def test_predict_over_50K_salary():
@@ -37,6 +37,6 @@ def test_predict_over_50K_salary():
     )
     response = client.post("predict", json=person.dict())
     assert response.status_code == 200
-    assert {'predictions': [1]} == response.json()
+    assert {'predictions': 1} == response.json()
 
  
