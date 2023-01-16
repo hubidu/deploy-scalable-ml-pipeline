@@ -8,7 +8,7 @@ def to_label(label_value):
 		return "> 50K"
 
 
-url = "http://localhost:8000/predict" 
+url = "https://stefan-ml-pipeline.herokuapp.com/predict" 
 person_data = {
 	'age': 39, 
 	'workclass': "State-gov",
@@ -25,6 +25,7 @@ person_data = {
         'native_country': "United-States"
 }
 
+print(f"Calling prediction api at {url}")
 response = requests.post(url, json=person_data)
 
 prediction = response.json()
