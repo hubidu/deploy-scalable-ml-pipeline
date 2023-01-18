@@ -55,34 +55,44 @@ def dump_slice_metrics(model, test_data, encoder, lb, scaler, slice_columns):
     with open('slice_output.txt', 'w') as f:
         f.write(json.dumps(slice_metrics, indent=2))
 
-logging.info('Reading training data ./data/trimmed_census.csv')
-data = pd.read_csv('./data/trimmed_census.csv')
 
-train, test = train_test_split(
-    data, test_size=0.30, stratify=data["salary"], random_state=123
-)
+def do_train_model():
+    """
+    Read the input csv, split the data into training and test sets and train the model on the training data.
+    Serialize the trained model to disk. 
+    """
+    logging.info('Reading training data ./data/trimmed_census.csv')
+    data = pd.read_csv('./data/trimmed_census.csv')
 
-X_train, y_train, encoder, lb, scaler = process_data(
-    train, categorical_features=cat_features, label="salary", training=True
-)
+    train, test = train_test_split(
+        data, test_size=0.30, stratify=data["salary"], random_state=123
+    )
 
-logging.info('Training the model')
-model = train_model(X_train, y_train)
+    X_train, y_train, encoder, lb, scaler = process_data(
+        train, categorical_features=cat_features, label="salary", training=True
+    )
 
-y_pred = inference(model, X_train)
+    logging.info('Training the model')
+    model = train_model(X_train, y_train)
 
-precision, recall, beta = compute_model_metrics(y_train, y_pred)
-logging.info(f"Training set metrics: Precision={precision}, Recall={recall}")
+    y_pred = inference(model, X_train)
 
-train["labels"] = y_pred.tolist()
-logging.info(train.head())
+    precision, recall, beta = compute_model_metrics(y_train, y_pred)
+    logging.info(f"Training set metrics: Precision={precision}, Recall={recall}")
 
-logging.info('Computing slice metrics')
-dump_slice_metrics(model, test, encoder, lb, scaler, ['sex', 'occupation', 'race'])
+    train["labels"] = y_pred.tolist()
+    logging.info(train.head())
 
-logging.info('Saving model to ./model/census_model.joblib')
-dump(model, './model/census_model.joblib')
-dump(encoder, './model/encoder.joblib')
-dump(scaler, './model/scaler.joblib')
+    logging.info('Computing slice metrics')
+    dump_slice_metrics(model, test, encoder, lb, scaler, ['sex', 'occupation', 'race'])
 
-logging.info('Success.')
+    logging.info('Saving model to ./model/census_model.joblib')
+    dump(model, './model/census_model.joblib')
+    dump(encoder, './model/encoder.joblib')
+    dump(scaler, './model/scaler.joblib')
+
+    logging.info('Success.')
+
+
+if __name__ == "__main__":
+    do_train_model()
