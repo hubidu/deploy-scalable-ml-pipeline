@@ -18,6 +18,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: s-weigand/setup-conda@v1
+        with:
+          activate-conda: false
       - name: Set up Python 3.8
         uses: actions/setup-python@v3
         with:
