@@ -1,0 +1,9 @@
+name: Income Estimation
+
+conda_env: conda_env.yaml
+
+entry_points:
+  main:
+    command: "python starter/train_model.py"
+  test:
+    command: "pytest"

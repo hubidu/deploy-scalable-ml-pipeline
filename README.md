@@ -18,6 +18,20 @@ Install dependencies using pip or creating a conda environment
 
 ## Train
 
+Use mlflow to train the model
+
+```bash
+   mlflow run . -e main
+```
+
+The serialized model, scalers and encoders will be written to the **model** subdirectory.
+
+Unit tests can be run using
+
+```bash
+   mlflow run . -e test
+```
+
 ## REST API
 
 There is a simple REST API available to make model predictions.
