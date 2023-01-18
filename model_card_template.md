@@ -44,6 +44,9 @@ However metrics may vary considerably on slices of the dataset:
 
 ## Ethical Considerations
 
+The lower recall figure for the "Amer-Indian-Eskimo" group shows that using the model might lead to discrimination against certain racial or occupational groups, because it would predict salaries below 50 K more often than for other groups.
+As a consequence the model should not be used for these groups, if it's predictions have material consequences for the respective person (i. e. getting or not getting a discount in an ecommerce store).
+
 ## Caveats and Recommendations
 
 - data is heavily skewed towards white and married males
