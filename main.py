@@ -28,6 +28,15 @@ class PersonData(BaseModel):
     class Config:
         allow_population_by_field_name = True
 
+
+@app.on_event("startup")
+async def startup_event(): 
+    global model, encoder, scaler
+    model = load("./model/census_model.joblib")
+    encoder = load("./model/encoder.joblib")
+    scaler = load("./model/scaler.joblib")
+
+
 @app.get("/")
 def get_root():
     return "Welcome to the salary prediction api"
@@ -45,16 +54,13 @@ def predict(person_data: PersonData):
         "sex",
         "native-country",
     ]
-    model = load("./model/census_model.joblib")
-    encoder = load("./model/encoder.joblib")
-    scaler = load("./model/scaler.joblib")
 
     df = pd.DataFrame(data=person_data.dict(by_alias=True), index=[0])
-    
+
     X, _, _, _, _ = process_data(
         df, cat_features, None, training=False, encoder=encoder, scaler=scaler
     )
-    
+
     preds = inference(model, X)
 
     return JSONResponse(content={'predictions': int(preds[0])})
