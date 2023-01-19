@@ -9,7 +9,9 @@ from ml.data import process_data
 from ml.model import train_model, compute_model_metrics, inference
 import logging
 
-logging.basicConfig(filename='training.log', level=logging.INFO)
+logging.basicConfig(filename='training.log', level=logging.DEBUG)
+logger = logging.getLogger("train_model")
+logger.setLevel(logging.DEBUG)
 
 cat_features = [
     "workclass",
@@ -61,7 +63,7 @@ def do_train_model():
     Read the input csv, split the data into training and test sets and train the model on the training data.
     Serialize the trained model to disk. 
     """
-    logging.info('Reading training data ./data/trimmed_census.csv')
+    logger.info('Reading training data ./data/trimmed_census.csv')
     data = pd.read_csv('./data/trimmed_census.csv')
 
     train, test = train_test_split(
@@ -72,26 +74,26 @@ def do_train_model():
         train, categorical_features=cat_features, label="salary", training=True
     )
 
-    logging.info('Training the model')
+    logger.info('Training the model')
     model = train_model(X_train, y_train)
 
     y_pred = inference(model, X_train)
 
     precision, recall, beta = compute_model_metrics(y_train, y_pred)
-    logging.info(f"Training set metrics: Precision={precision}, Recall={recall}")
+    logger.info(f"Training set metrics: Precision={precision}, Recall={recall}, Beta={beta}")
 
     train["labels"] = y_pred.tolist()
-    logging.info(train.head())
+    logger.info(train.head())
 
-    logging.info('Computing slice metrics')
+    logger.info('Computing slice metrics')
     dump_slice_metrics(model, test, encoder, lb, scaler, ['sex', 'occupation', 'race'])
 
-    logging.info('Saving model to ./model/census_model.joblib')
+    logger.info('Saving model to ./model/census_model.joblib')
     dump(model, './model/census_model.joblib')
     dump(encoder, './model/encoder.joblib')
     dump(scaler, './model/scaler.joblib')
 
-    logging.info('Success.')
+    logger.info('Success.')
 
 
 if __name__ == "__main__":
