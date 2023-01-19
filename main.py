@@ -29,8 +29,14 @@ class PersonData(BaseModel):
         allow_population_by_field_name = True
 
 
+model = None
+encoder = None
+scaler = None
+
+
 @app.on_event("startup")
-async def startup_event(): 
+def startup_event(): 
+    print("ON STARTUP")
     global model, encoder, scaler
     model = load("./model/census_model.joblib")
     encoder = load("./model/encoder.joblib")

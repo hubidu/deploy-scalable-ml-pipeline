@@ -3,13 +3,11 @@ from fastapi.testclient import TestClient
 from main import app, PersonData
 
 
-client = TestClient(app)
-
-
 def test_get_root():
-    response = client.get("/")
-    assert response.status_code == 200
-    assert "Welcome" in response.text
+    with TestClient(app) as client:
+        response = client.get("/")
+        assert response.status_code == 200
+        assert "Welcome" in response.text
 
 
 def test_predict_under_50K_salary():
@@ -21,9 +19,10 @@ def test_predict_under_50K_salary():
         hours_per_week=40,
         native_country="United-States"
     )
-    response = client.post("predict", json=person.dict())
-    assert response.status_code == 200
-    assert {'predictions': 0} == response.json()
+    with TestClient(app) as client:
+        response = client.post("predict", json=person.dict())
+        assert response.status_code == 200
+        assert {'predictions': 0} == response.json()
 
 
 def test_predict_over_50K_salary():
@@ -35,8 +34,9 @@ def test_predict_over_50K_salary():
         hours_per_week=40,
         native_country="United-States"
     )
-    response = client.post("predict", json=person.dict())
-    assert response.status_code == 200
-    assert {'predictions': 1} == response.json()
+    with TestClient(app) as client:
+        response = client.post("predict", json=person.dict())
+        assert response.status_code == 200
+        assert {'predictions': 1} == response.json()
 
  
